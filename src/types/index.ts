@@ -1,4 +1,4 @@
-﻿export type JsonPrimitive = string | number | boolean | null;
+export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
 export interface JsonObject {
   [key: string]: JsonValue;
@@ -221,6 +221,7 @@ export interface Threat {
   resolved_at: string | null;
   created_at: string;
   updated_at: string;
+  affected_asset_names?: string[];
 }
 
 export interface IncidentTimelineEntry {
@@ -228,6 +229,7 @@ export interface IncidentTimelineEntry {
   action: string;
   user_id: string | null;
   note: string;
+  user_name?: string;
 }
 
 export interface Incident {
@@ -424,5 +426,9 @@ export interface Database {
     };
   };
 }
+
+
+
+
 
 
