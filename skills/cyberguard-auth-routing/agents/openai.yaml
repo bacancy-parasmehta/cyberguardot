@@ -1,0 +1,7 @@
+interface:
+  display_name: "CyberGuard Auth"
+  short_description: "Implement auth, sessions, and routing."
+  default_prompt: "Use $cyberguard-auth-routing to build Supabase auth and protected routing."
+policy:
+  allow_implicit_invocation: true
+

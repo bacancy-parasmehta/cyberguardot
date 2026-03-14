@@ -1,0 +1,7 @@
+interface:
+  display_name: "CyberGuard Foundation"
+  short_description: "Scaffold the Next.js app foundation."
+  default_prompt: "Use $cyberguard-foundation to build the project foundation for CyberGuard OT."
+policy:
+  allow_implicit_invocation: true
+

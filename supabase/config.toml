@@ -1,0 +1,7 @@
+﻿project_id = "dsyevivpuxwwcexcnacy"
+
+[auth]
+site_url = "http://localhost:3001"
+additional_redirect_urls = ["https://your-domain.vercel.app", "http://localhost:3001"]
+enable_signup = false
+jwt_expiry = 3600

@@ -1,0 +1,7 @@
+interface:
+  display_name: "CyberGuard Schema"
+  short_description: "Model Supabase schema, RLS, and seeds."
+  default_prompt: "Use $cyberguard-supabase-schema to implement Supabase schema and migrations."
+policy:
+  allow_implicit_invocation: true
+

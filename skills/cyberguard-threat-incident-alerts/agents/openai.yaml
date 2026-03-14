@@ -1,0 +1,7 @@
+interface:
+  display_name: "CyberGuard Monitoring"
+  short_description: "Build alerts, threats, and incidents."
+  default_prompt: "Use $cyberguard-threat-incident-alerts to implement SOC monitoring features."
+policy:
+  allow_implicit_invocation: true
+

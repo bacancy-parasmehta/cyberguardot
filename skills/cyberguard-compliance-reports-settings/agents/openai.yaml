@@ -1,0 +1,7 @@
+interface:
+  display_name: "CyberGuard Governance"
+  short_description: "Build compliance, reports, and settings."
+  default_prompt: "Use $cyberguard-compliance-reports-settings to implement governance features."
+policy:
+  allow_implicit_invocation: true
+

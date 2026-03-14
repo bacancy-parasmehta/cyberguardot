@@ -1,0 +1,7 @@
+interface:
+  display_name: "CyberGuard Release"
+  short_description: "Handle hardening, realtime, and deploy."
+  default_prompt: "Use $cyberguard-release-hardening to prepare the app for release."
+policy:
+  allow_implicit_invocation: true
+
