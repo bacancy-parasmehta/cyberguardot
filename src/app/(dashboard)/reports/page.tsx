@@ -1,17 +1,39 @@
-export const revalidate = 60;
+import { PageHeader } from "@/components/ui/PageHeader";
+import { getAlerts } from "@/lib/data/alerts";
+import { getAssets } from "@/lib/data/assets";
+import { getComplianceControls, getComplianceSummary } from "@/lib/data/compliance";
+import { getDashboardSummary } from "@/lib/data/dashboard";
+import { getIncidents } from "@/lib/data/incidents";
+import { getVulnerabilities } from "@/lib/data/vulnerabilities";
+import { ReportsPageClient } from "@/components/reports/ReportsPageClient";
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const [summary, alerts, assets, vulnerabilities, incidents, complianceControls, complianceSummary] =
+    await Promise.all([
+      getDashboardSummary(),
+      getAlerts(),
+      getAssets(),
+      getVulnerabilities(),
+      getIncidents(),
+      getComplianceControls(),
+      getComplianceSummary(),
+    ]);
+
   return (
     <section className="space-y-6">
-      <div className="rounded-xl border border-slate-700 bg-slate-900 p-6">
-        <h1 className="text-2xl font-semibold text-white">Reports</h1>
-        <p className="mt-3 text-sm text-slate-400">
-          Phase 5D should add report generation, JSON and CSV export, and saved-report placeholders here.
-        </p>
-      </div>
-      <div className="rounded-xl border border-slate-700 bg-slate-900 p-6 text-sm text-slate-400">
-        PDF export is intentionally deferred for the MVP.
-      </div>
+      <PageHeader
+        title="Reports"
+        subtitle="Generate stakeholder-friendly JSON and CSV exports from the live facility data."
+      />
+      <ReportsPageClient
+        summary={summary}
+        alerts={alerts}
+        assets={assets}
+        vulnerabilities={vulnerabilities}
+        incidents={incidents}
+        complianceControls={complianceControls}
+        complianceSummary={complianceSummary}
+      />
     </section>
   );
 }

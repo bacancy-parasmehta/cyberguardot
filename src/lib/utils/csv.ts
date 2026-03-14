@@ -3,26 +3,30 @@ export function jsonToCSV(data: object[]): string {
     return "";
   }
 
-  const headers = Object.keys(data[0]);
-  const lines = data.map((row) =>
-    headers
-      .map((header) => {
-        const value = (row as Record<string, unknown>)[header];
+  const headerSet = data.reduce<Set<string>>((set, item) => {
+    Object.keys(item).forEach((key) => set.add(key));
+    return set;
+  }, new Set<string>());
+  const headers = Array.from(headerSet);
 
-        if (value === null || value === undefined) {
-          return "";
-        }
+  const escapeValue = (value: unknown) => {
+    if (value === null || value === undefined) {
+      return "";
+    }
 
-        const stringValue =
-          typeof value === "string" ? value : JSON.stringify(value);
+    const stringValue =
+      typeof value === "object" ? JSON.stringify(value) : String(value);
 
-        return stringValue.includes(",")
-          ? `"${stringValue.replaceAll('"', '""')}"`
-          : stringValue;
-      })
-      .join(","),
+    if (stringValue.includes(",") || stringValue.includes("\n") || stringValue.includes('"')) {
+      return `"${stringValue.replaceAll('"', '""')}"`;
+    }
+
+    return stringValue;
+  };
+
+  const rows = data.map((item) =>
+    headers.map((header) => escapeValue((item as Record<string, unknown>)[header])).join(","),
   );
 
-  return [headers.join(","), ...lines].join("\n");
+  return [headers.join(","), ...rows].join("\n");
 }
-

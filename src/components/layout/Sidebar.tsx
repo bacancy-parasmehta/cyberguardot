@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertTriangle,
   Bell,
@@ -38,9 +38,42 @@ function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function Sidebar() {
+export function Sidebar({ initialNewAlertCount = 0 }: { initialNewAlertCount?: number }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [newAlertCount, setNewAlertCount] = useState(initialNewAlertCount);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshAlertCount() {
+      try {
+        const response = await fetch("/api/alerts?summary=true", { cache: "no-store" });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as { stats?: { new?: number } };
+
+        if (!cancelled && typeof payload.stats?.new === "number") {
+          setNewAlertCount(payload.stats.new);
+        }
+      } catch {
+        // Ignore polling failures and keep the last known count.
+      }
+    }
+
+    void refreshAlertCount();
+    const intervalId = window.setInterval(() => {
+      void refreshAlertCount();
+    }, 30000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   const navContent = (
     <>
@@ -58,6 +91,7 @@ export function Sidebar() {
         {dashboardNavigation.map((item) => {
           const Icon = iconMap[item.icon];
           const active = isActivePath(pathname, item.href);
+          const showBadge = item.href === "/alerts" && newAlertCount > 0;
 
           return (
             <Link
@@ -73,6 +107,11 @@ export function Sidebar() {
             >
               <Icon className="h-4 w-4" />
               <span>{item.label}</span>
+              {showBadge ? (
+                <span className="ml-auto inline-flex min-w-6 items-center justify-center rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-300">
+                  {newAlertCount}
+                </span>
+              ) : null}
             </Link>
           );
         })}

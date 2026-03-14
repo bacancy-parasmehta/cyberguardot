@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   ActionResult,
   Asset,
   Threat,
@@ -10,6 +10,13 @@ import { createThreatSchema, type CreateThreatInput } from "@/lib/validations";
 import { getDataContext } from "@/lib/data/context";
 import { buildThreatStats } from "@/lib/data/stats";
 
+const threatTransitions: Record<ThreatStatus, ThreatStatus[]> = {
+  active: ["investigating", "contained", "resolved"],
+  investigating: ["contained", "resolved"],
+  contained: ["resolved"],
+  resolved: [],
+};
+
 function mutationError(message: string): ActionResult<never> {
   return {
     success: false,
@@ -19,6 +26,40 @@ function mutationError(message: string): ActionResult<never> {
 
 function canManageThreats(role: string): boolean {
   return role === "admin" || role === "engineer";
+}
+
+async function hydrateThreats(
+  threats: Threat[],
+): Promise<Threat[]> {
+  const context = await getDataContext();
+
+  if (!context || threats.length === 0) {
+    return threats;
+  }
+
+  const assetIds = Array.from(
+    new Set(threats.flatMap((threat) => threat.affected_asset_ids ?? [])),
+  );
+
+  if (assetIds.length === 0) {
+    return threats;
+  }
+
+  const { data } = await context.supabase
+    .from("assets")
+    .select("id, name")
+    .eq("facility_id", context.facilityId)
+    .in("id", assetIds);
+  const assetMap = new Map(
+    (data ?? []).map((asset: Pick<Asset, "id" | "name">) => [asset.id, asset.name]),
+  );
+
+  return threats.map((threat) => ({
+    ...threat,
+    affected_asset_names: threat.affected_asset_ids.map(
+      (assetId) => assetMap.get(assetId) ?? assetId,
+    ),
+  }));
 }
 
 async function fetchThreatsForFacility(): Promise<Threat[]> {
@@ -38,7 +79,7 @@ async function fetchThreatsForFacility(): Promise<Threat[]> {
     return [];
   }
 
-  return (data ?? []) as Threat[];
+  return hydrateThreats((data ?? []) as Threat[]);
 }
 
 export async function getThreats(): Promise<Threat[]> {
@@ -77,8 +118,10 @@ export async function getThreatById(id: string): Promise<ThreatDetail | null> {
     affectedAssets = (data ?? []) as Asset[];
   }
 
+  const [hydratedThreat] = await hydrateThreats([threat]);
+
   return {
-    ...threat,
+    ...hydratedThreat,
     affected_assets: affectedAssets,
   };
 }
@@ -101,6 +144,22 @@ export async function updateThreatStatus(
     return mutationError("Your role does not have permission to update threats.");
   }
 
+  const { data: currentThreatData } = await context.supabase
+    .from("threats")
+    .select("*")
+    .eq("facility_id", context.facilityId)
+    .eq("id", id)
+    .maybeSingle();
+  const currentThreat = (currentThreatData ?? null) as Threat | null;
+
+  if (!currentThreat) {
+    return mutationError("Threat not found.");
+  }
+
+  if (!threatTransitions[currentThreat.status].includes(status)) {
+    return mutationError(`Threat cannot move from ${currentThreat.status} to ${status}.`);
+  }
+
   const { data: threatData, error } = await context.supabase
     .from("threats")
     .update({
@@ -117,9 +176,11 @@ export async function updateThreatStatus(
     return mutationError(error?.message ?? "Unable to update threat.");
   }
 
+  const [hydratedThreat] = await hydrateThreats([threat]);
+
   return {
     success: true,
-    data: threat,
+    data: hydratedThreat,
   };
 }
 
@@ -170,8 +231,14 @@ export async function createThreat(
     return mutationError(error?.message ?? "Unable to create threat.");
   }
 
+  const [hydratedThreat] = await hydrateThreats([threat]);
+
   return {
     success: true,
-    data: threat,
+    data: hydratedThreat,
   };
+}
+
+export function getAllowedThreatTransitions(status: ThreatStatus): ThreatStatus[] {
+  return threatTransitions[status];
 }

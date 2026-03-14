@@ -1,19 +1,18 @@
-import { PageHeader } from "@/components/ui/PageHeader";
+import { notFound } from "next/navigation";
 
-export default function IncidentDetailPage({
+import { IncidentDetailClient } from "@/components/incidents/IncidentDetailClient";
+import { getIncidentById } from "@/lib/data/incidents";
+
+export default async function IncidentDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
-  return (
-    <section className="space-y-6">
-      <PageHeader
-        title={`Incident ${params.id}`}
-        subtitle="Phase 5C should replace this placeholder with status transitions, timeline notes, and assignment controls."
-      />
-      <div className="rounded-xl border border-slate-700 bg-slate-900 p-6 text-sm text-slate-400">
-        Incident detail route scaffold.
-      </div>
-    </section>
-  );
+  const incident = await getIncidentById(params.id);
+
+  if (!incident) {
+    notFound();
+  }
+
+  return <IncidentDetailClient incident={incident} />;
 }
