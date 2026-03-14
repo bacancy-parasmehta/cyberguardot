@@ -14,7 +14,7 @@
 
 1. Push this repository to GitHub.
 2. Import the repository into Vercel.
-3. Add every variable from `.env.production.example`.
+3. Add every variable from `.env.production.example`. Use `NEXT_PUBLIC_SUPABASE_PUBLISHABLE` for the browser-safe Supabase value and keep `SUPABASE_SERVICE_ROLE_KEY` server-only.
 4. Set the runtime to Node.js 20.x.
 5. Deploy and verify login, dashboard access, and protected routing.
 
@@ -44,3 +44,4 @@ Recommended preview framing:
 ## Backup Note
 
 Supabase Pro includes managed backups. On a free-tier MVP, schedule a manual weekly database export from the Supabase dashboard until an automated backup plan is in place.
+

@@ -1,4 +1,4 @@
-Phase 1: Project Scaffolding & Environment Setup
+﻿Phase 1: Project Scaffolding & Environment Setup
 Goal: Bootstrap the Next.js App Router project with Supabase and Vercel configuration wired up end-to-end.
 Codex CLI Prompt:
 Create a new Next.js 14 project using the App Router (not Pages Router) called "cyberguard-ot". Use TypeScript, Tailwind CSS, and ESLint. Do the following exactly:
@@ -56,19 +56,19 @@ Create a new Next.js 14 project using the App Router (not Pages Router) called "
    /hooks/
 
 4. Create /src/lib/supabase/client.ts:
-   - Export createBrowserClient from @supabase/ssr using NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+   - Export createBrowserClient from @supabase/ssr using NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE
 
 5. Create /src/lib/supabase/server.ts:
    - Export createServerClient using cookies() from next/headers (server-side Supabase client)
 
 6. Create /src/middleware.ts:
    - Use @supabase/ssr to refresh sessions on every request
-   - Protect all routes under /(dashboard) — redirect unauthenticated users to /auth/login
+   - Protect all routes under /(dashboard) â€” redirect unauthenticated users to /auth/login
    - Allow /auth/* routes publicly
 
 7. Create .env.local with these placeholder keys:
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE=your_supabase_anon_or_publishable_value
    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 8. Create vercel.json at root:
@@ -81,7 +81,7 @@ Create a new Next.js 14 project using the App Router (not Pages Router) called "
 
 9. Create /src/lib/utils.ts exporting a cn() function using clsx + tailwind-merge.
 
-10. Create /src/types/index.ts with empty export placeholder — we will populate this in Phase 2.
+10. Create /src/types/index.ts with empty export placeholder â€” we will populate this in Phase 2.
 
 11. Update tailwind.config.ts to include a dark mode class strategy and extend colors with a custom palette:
     primary: #0ea5e9 (sky-500)

@@ -5,12 +5,12 @@
 import { cookies } from "next/headers";
 
 import type { Database } from "@/types";
-import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/config";
+import { getSupabasePublishableValue, getSupabaseUrl } from "@/lib/config";
 
 export async function createServerClient() {
   const cookieStore = cookies();
 
-  return createSupabaseServerClient<Database>(getSupabaseUrl(), getSupabaseAnonKey(), {
+  return createSupabaseServerClient<Database>(getSupabaseUrl(), getSupabasePublishableValue(), {
     cookies: {
       get(name: string) {
         return cookieStore.get(name)?.value;
@@ -32,3 +32,4 @@ export async function createServerClient() {
     },
   });
 }
+

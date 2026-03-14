@@ -17,13 +17,13 @@ function isPlaceholderEnv(value: string | undefined): boolean {
 
 function hasConfiguredSupabase(): boolean {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabasePublishableValue = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   return Boolean(
     supabaseUrl &&
-      supabaseAnonKey &&
+      supabasePublishableValue &&
       !isPlaceholderEnv(supabaseUrl) &&
-      !isPlaceholderEnv(supabaseAnonKey),
+      !isPlaceholderEnv(supabasePublishableValue),
   );
 }
 
@@ -90,3 +90,4 @@ export async function signOut(): Promise<void> {
 
   redirect("/auth/login");
 }
+

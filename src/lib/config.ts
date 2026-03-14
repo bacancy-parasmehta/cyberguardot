@@ -1,4 +1,4 @@
-export function getSupabaseUrl(): string {
+﻿export function getSupabaseUrl(): string {
   const value = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   if (!value) {
@@ -8,11 +8,13 @@ export function getSupabaseUrl(): string {
   return value;
 }
 
-export function getSupabaseAnonKey(): string {
-  const value = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+export function getSupabasePublishableValue(): string {
+  const value =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!value) {
-    throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY is missing.");
+    throw new Error("NEXT_PUBLIC_SUPABASE_PUBLISHABLE is missing.");
   }
 
   return value;
@@ -35,4 +37,3 @@ export function getAppUrl(): string {
 export function isProduction(): boolean {
   return process.env.NODE_ENV === "production";
 }
-

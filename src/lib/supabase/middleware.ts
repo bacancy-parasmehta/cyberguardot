@@ -2,7 +2,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import type { Database } from "@/types";
-import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/config";
+import { getSupabasePublishableValue, getSupabaseUrl } from "@/lib/config";
 
 const protectedPrefixes = [
   "/dashboard",
@@ -50,20 +50,20 @@ export async function updateSession(request: NextRequest) {
   }
 
   let supabaseUrl: string;
-  let supabaseAnonKey: string;
+  let supabasePublishableValue: string;
 
   try {
     supabaseUrl = getSupabaseUrl();
-    supabaseAnonKey = getSupabaseAnonKey();
+    supabasePublishableValue = getSupabasePublishableValue();
   } catch {
     return response;
   }
 
-  if (isPlaceholderEnv(supabaseUrl) || isPlaceholderEnv(supabaseAnonKey)) {
+  if (isPlaceholderEnv(supabaseUrl) || isPlaceholderEnv(supabasePublishableValue)) {
     return response;
   }
 
-  const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+  const supabase = createServerClient<Database>(supabaseUrl, supabasePublishableValue, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -110,3 +110,4 @@ export async function updateSession(request: NextRequest) {
     return response;
   }
 }
+
