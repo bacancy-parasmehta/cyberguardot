@@ -1,55 +1,51 @@
-import type { DashboardSummary } from "@/types";
+﻿import type { DashboardSummary } from "@/types";
+import { getAlerts } from "@/lib/data/alerts";
+import { getAssets } from "@/lib/data/assets";
+import { getIncidents } from "@/lib/data/incidents";
+import {
+  buildAlertStats,
+  buildAssetRiskDistribution,
+  buildAssetStats,
+  buildIncidentStats,
+  buildRiskTrend,
+  buildThreatStats,
+  buildVulnerabilityBreakdown,
+  buildVulnerabilityStats,
+} from "@/lib/data/stats";
+import { getThreats } from "@/lib/data/threats";
+import { getVulnerabilities } from "@/lib/data/vulnerabilities";
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
+  const [assets, vulnerabilities, threats, incidents, alerts] = await Promise.all([
+    getAssets(),
+    getVulnerabilities(),
+    getThreats(),
+    getIncidents(),
+    getAlerts(),
+  ]);
+
   return {
-    assets: {
-      total: 0,
-      online: 0,
-      offline: 0,
-      degraded: 0,
-      critical_risk: 0,
-      high_risk: 0,
-    },
-    vulnerabilities: {
-      total: 0,
-      critical: 0,
-      high: 0,
-      medium: 0,
-      low: 0,
-      open: 0,
-      resolved: 0,
-    },
-    threats: {
-      total: 0,
-      active: 0,
-      investigating: 0,
-      contained: 0,
-      resolved: 0,
-    },
-    incidents: {
-      total: 0,
-      open: 0,
-      investigating: 0,
-      contained: 0,
-      resolved: 0,
-      avg_resolution_hours: 0,
-    },
-    alerts: {
-      total: 0,
-      new: 0,
-      critical: 0,
-      high: 0,
-      acknowledged_today: 0,
-    },
-    recent_alerts: [],
-    recent_incidents: [],
-    risk_trend: [],
+    assets: buildAssetStats(assets),
+    vulnerabilities: buildVulnerabilityStats(vulnerabilities),
+    threats: buildThreatStats(threats),
+    incidents: buildIncidentStats(incidents),
+    alerts: buildAlertStats(alerts),
+    vulnerability_breakdown: buildVulnerabilityBreakdown(vulnerabilities),
+    asset_risk_distribution: buildAssetRiskDistribution(assets),
+    recent_alerts: alerts.slice(0, 5),
+    recent_incidents: incidents.slice(0, 5),
+    risk_trend: buildRiskTrend(30, assets, vulnerabilities, alerts),
   };
 }
 
 export async function getRiskTrend(
-  _days: number,
+  days: number,
 ): Promise<Array<{ date: string; score: number }>> {
-  return [];
-}
+  const [assets, vulnerabilities, alerts] = await Promise.all([
+    getAssets(),
+    getVulnerabilities(),
+    getAlerts(),
+  ]);
 
+  return buildRiskTrend(days, assets, vulnerabilities, alerts);
+}

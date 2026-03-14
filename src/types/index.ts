@@ -1,4 +1,4 @@
-export type JsonPrimitive = string | number | boolean | null;
+﻿export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
 export interface JsonObject {
   [key: string]: JsonValue;
@@ -387,6 +387,8 @@ export interface DashboardSummary {
   threats: ThreatStats;
   incidents: IncidentStats;
   alerts: AlertStats;
+  vulnerability_breakdown: Array<{ level: RiskLevel; count: number }>;
+  asset_risk_distribution: Array<{ level: RiskLevel; count: number }>;
   recent_alerts: Alert[];
   recent_incidents: Incident[];
   risk_trend: Array<{ date: string; score: number }>;
@@ -422,4 +424,5 @@ export interface Database {
     };
   };
 }
+
 
